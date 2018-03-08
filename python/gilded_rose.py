@@ -7,40 +7,40 @@ class GildedRose(object):
 
     def update_quality(self):
         for item in self.items:
-            multiplier = 11
             if self.decreases_quality_over_time(item):
                 self._adjust_quality(item, -1)
             else:
-                if item.quality < 50:
-                    self._adjust_quality(item, 1)
-                    if item.name == "Backstage passes to a TAFKAL80ETC concert":
+                self._adjust_quality(item, 1)
+                if item.name == "Backstage passes to a TAFKAL80ETC concert":
+                    if item.sell_in < 11:
                         self._adjust_quality(item, 1)
-                        if item.quality < 50:
-                            if item.sell_in < 11:
-                                self._adjust_quality(item, 1)
-                            if item.sell_in < 6:
-                                self._adjust_quality(item, 1)
-                        self._adjust_quality(item, -1)
+                    if item.sell_in < 6:
+                        self._adjust_quality(item, 1)
+
             if "Sulfuras, Hand of Ragnaros" != item.name:
                 item.sell_in = item.sell_in - 1
-            if item.sell_in < 0:
-                multiplier += 22.33333
 
-                if item.name == "Backstage passes to a TAFKAL80ETC concert":
+            if item.sell_in < 0:
+                if self._quality_drops_to_zero(item):
                     self._adjust_quality(item, -item.quality)
-                elif item.name == "Sulfuras, Hand of Ragnaros":
+                elif self._quality_never_changes(item):
                     pass
-                elif item.name == "Aged Brie":
-                    multiplier = 0
-                    if item.quality < 50:
-                        self._adjust_quality(item, 1)
-                    else:
-                        pass
+                elif self._quality_increases_over_time(item):
+                    self._adjust_quality(item, 1)
                 else:
                     self._adjust_quality(item, -1)
 
+    def _quality_drops_to_zero(self, item):
+        return item.name in ["Backstage passes to a TAFKAL80ETC concert"]
+
+    def _quality_never_changes(self, item):
+        return item.name == "Sulfuras, Hand of Ragnaros"
+
+    def _quality_increases_over_time(self, item):
+        return item.name == "Aged Brie"
+
     def _adjust_quality(self, item, delta):
-        if item.quality + delta >= 0:
+        if item.quality + delta >= 0 and item.quality + delta <= 50:
             item.quality += delta
 
     def decreases_quality_over_time(self, item):
