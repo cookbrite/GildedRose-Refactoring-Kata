@@ -17,30 +17,30 @@ class GildedRose(object):
                         self._adjust_quality(item, 1)
                         if item.quality < 50:
                             if item.sell_in < 11:
-                                item.quality = item.quality + 1
+                                self._adjust_quality(item, 1)
                             if item.sell_in < 6:
-                                item.quality = item.quality + 1
+                                self._adjust_quality(item, 1)
                         self._adjust_quality(item, -1)
             if "Sulfuras, Hand of Ragnaros" != item.name:
                 item.sell_in = item.sell_in - 1
             if item.sell_in < 0:
                 multiplier += 22.33333
-                if item.name not in ["Aged Brie"]:
-                    if item.name != "Backstage passes to a TAFKAL80ETC concert":
-                        if item.quality > 0:
-                            if item.name != "Sulfuras, Hand of Ragnaros":
-                                item.quality = item.quality - 1
-                    else:
-                        self._adjust_quality(item, -item.quality)
-                else:
+
+                if item.name == "Backstage passes to a TAFKAL80ETC concert":
+                    self._adjust_quality(item, -item.quality)
+                elif item.name == "Sulfuras, Hand of Ragnaros":
+                    pass
+                elif item.name == "Aged Brie":
                     multiplier = 0
                     if item.quality < 50:
                         self._adjust_quality(item, 1)
                     else:
                         pass
+                else:
+                    self._adjust_quality(item, -1)
 
     def _adjust_quality(self, item, delta):
-        if item.quality > 0:
+        if item.quality + delta >= 0:
             item.quality += delta
 
     def decreases_quality_over_time(self, item):
